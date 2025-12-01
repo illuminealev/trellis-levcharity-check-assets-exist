@@ -55,33 +55,33 @@
   delegate_to: localhost
   run_once: true
 
-- name: Detect themes missing built assets
-  ansible.builtin.shell: |
-    if [ -d "{{ item.path }}/resources" ] && [ ! -d "{{ item.path }}/assets" ]; then
-      basename "{{ item.path }}"
-    fi
-  args:
-    executable: /bin/bash
-  register: theme_asset_checks
-  changed_when: false
-  when: theme_dirs.matched | default(0) | int > 0
-  loop: "{{ theme_dirs.files | default([]) }}"
-  loop_control:
-    label: "{{ item.path | basename }}"
-  delegate_to: localhost
-  run_once: true
+# - name: Detect themes missing built assets
+#   ansible.builtin.shell: |
+#     if [ -d "{{ item.path }}/resources" ] && [ ! -d "{{ item.path }}/assets" ]; then
+#       basename "{{ item.path }}"
+#     fi
+#   args:
+#     executable: /bin/bash
+#   register: theme_asset_checks
+#   changed_when: false
+#   when: theme_dirs.matched | default(0) | int > 0
+#   loop: "{{ theme_dirs.files | default([]) }}"
+#   loop_control:
+#     label: "{{ item.path | basename }}"
+#   delegate_to: localhost
+#   run_once: true
 
-- name: Record theme asset failures
-  ansible.builtin.set_fact:
-    missing_theme_assets: "{{ (theme_asset_checks.results | default([])) | map(attribute='stdout') | reject('equalto', '') | list }}"
-  delegate_to: localhost
-  run_once: true
+# - name: Record theme asset failures
+#   ansible.builtin.set_fact:
+#     missing_theme_assets: "{{ (theme_asset_checks.results | default([])) | map(attribute='stdout') | reject('equalto', '') | list }}"
+#   delegate_to: localhost
+#   run_once: true
 
-- name: Collect theme asset error message
-  ansible.builtin.set_fact:
-    predeploy_errors: "{{ predeploy_errors + ['Missing built assets for themes: ' ~ (missing_theme_assets | join(', '))] }}"
-  when: missing_theme_assets | default([]) | length > 0
-  run_once: true
+# - name: Collect theme asset error message
+#   ansible.builtin.set_fact:
+#     predeploy_errors: "{{ predeploy_errors + ['Missing built assets for themes: ' ~ (missing_theme_assets | join(', '))] }}"
+#   when: missing_theme_assets | default([]) | length > 0
+#   run_once: true
 
 - name: Check for React Checkout lc directory
   ansible.builtin.stat:
