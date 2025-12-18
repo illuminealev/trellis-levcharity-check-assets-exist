@@ -83,29 +83,6 @@
   when: missing_theme_assets | default([]) | length > 0
   run_once: true
 
-- name: Check for React Checkout lc directory
-  ansible.builtin.stat:
-    path: "{{ project_local_path }}/web/lc"
-  register: lc_dir
-  delegate_to: localhost
-  run_once: true
-
-- name: Ensure lc/checkout exists when lc directory present
-  ansible.builtin.stat:
-    path: "{{ project_local_path }}/web/lc/checkout"
-  register: lc_checkout_dir
-  when: lc_dir.stat.exists
-  delegate_to: localhost
-  run_once: true
-
-- name: Fail when lc directory is missing checkout
-  ansible.builtin.set_fact:
-    predeploy_errors: "{{ predeploy_errors + ['Found React Checkout repo, but missing required \"checkout\" subdirectory.'] }}"
-  when:
-    - lc_dir.stat.exists
-    - not lc_checkout_dir.stat.exists
-  run_once: true
-
 - name: Fail when predeploy errors exist
   ansible.builtin.fail:
     msg: |-
