@@ -18,7 +18,7 @@
 
 - name: Detect LevCharity plugins missing built assets
   ansible.builtin.shell: |
-    if [ -d "{{ item.path }}/resources" ] && [ ! -d "{{ item.path }}/assets" ]; then
+    if [ -d "{{ item.path }}/resources" ] && -d "{{ item.path }}/resources/scripts" ] && [ ! -d "{{ item.path }}/assets" ]; then
       basename "{{ item.path }}"
     fi
   args:
