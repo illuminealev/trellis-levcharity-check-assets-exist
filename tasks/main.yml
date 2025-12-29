@@ -50,7 +50,7 @@
 
 - name: Record LevCharity plugin asset failures
   ansible.builtin.set_fact:
-    missing_plugin_assets: "{{ (levcharity_plugin_asset_checks.results | default([])) | map(attribute='stdout') | reject('equalto', '') | list }}"
+    missing_plugin_assets: "{{ (levcharity_plugin_asset_checks.results | default([]) | selectattr('stdout', 'defined') | selectattr('stdout', '!=', '') | map(attribute='stdout') | list) }}"
   delegate_to: localhost
   run_once: true
 
