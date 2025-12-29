@@ -5,6 +5,19 @@
   delegate_to: localhost
   run_once: true
 
+- name: Define plugins excluded from asset checks
+  ansible.builtin.set_fact:
+    excluded_plugins:
+      - levcharity-constant-contact
+      - levcharity-debugger
+      - levcharity-gravityform-product
+      - levcharity-jira
+      - levcharity-raisers-edge-nxt
+      - levcharity-receipts
+      - levcharity-salesforce
+  delegate_to: localhost
+  run_once: true
+
 - name: Gather LevCharity plugins
   ansible.builtin.find:
     paths: "{{ project_local_path }}/web/app/plugins"
@@ -18,14 +31,17 @@
 
 - name: Detect LevCharity plugins missing built assets
   ansible.builtin.shell: |
-    if [ -d "{{ item.path }}/resources" ] && -d "{{ item.path }}/resources/scripts" ] && [ ! -d "{{ item.path }}/assets" ]; then
-      basename "{{ item.path }}"
+    plugin_name=$(basename "{{ item.path }}")
+    if [ -d "{{ item.path }}/resources" ] && [ -d "{{ item.path }}/resources/scripts" ] && [ ! -d "{{ item.path }}/assets" ]; then
+      echo "$plugin_name"
     fi
   args:
     executable: /bin/bash
   register: levcharity_plugin_asset_checks
   changed_when: false
-  when: levcharity_plugin_dirs.matched | default(0) | int > 0
+  when:
+    - levcharity_plugin_dirs.matched | default(0) | int > 0
+    - (item.path | basename) not in excluded_plugins
   loop: "{{ levcharity_plugin_dirs.files | default([]) }}"
   loop_control:
     label: "{{ item.path | basename }}"
